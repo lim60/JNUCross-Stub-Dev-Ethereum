@@ -26,13 +26,13 @@ dependencies {
     implementation 'com.webank:wecross-java-stub:1.0.0'
     // toml解析器
     implementation 'com.moandjiezana.toml:toml4j:0.7.2'
-    // 日志
-    implementation 'org.apache.logging.log4j:log4j-core:2.14.0'
 
     //TODO 添加其他依赖
 
-    // Use JUnit test framework
+    // Junit测试框架
     testImplementation 'junit:junit:4.12'
+    // 日志
+    testImplementation 'org.apache.logging.log4j:log4j-core:2.14.0'
 }
 
 
@@ -63,12 +63,12 @@ task makeJar(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar, d
 
     manifest {
         attributes(
-                'Main-Class': 'com.webank.wecross.stub.bcos.normal',
+                'Main-Class': 'wecross.stub.demo.DemoMain',
                 'version': project.version,
         )
     }
 
-    from zipTree(shadowJar.archivePath)
+    from zipTree(shadowJar.getArchiveFile())
 }
 
 jar.enabled = false
