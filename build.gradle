@@ -1,0 +1,75 @@
+plugins {
+    id 'java'
+    id 'idea'
+    id 'eclipse'
+    id 'maven'
+    id 'com.github.johnrengelman.shadow' version '5.2.0'
+}
+
+group 'wecross.stub.sample'
+version '1.0.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+// In this section you declare where to find the dependencies of your project
+repositories {
+    // Use jcenter for resolving your dependencies.
+    // You can declare any Maven/Ivy/file repository here.
+    jcenter()
+    maven { url "https://maven.aliyun.com/nexus/content/groups/public/" }
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
+}
+
+dependencies {
+    // stub接口定义
+    implementation 'com.webank:wecross-java-stub:1.0.0'
+    // toml解析器
+    implementation 'com.moandjiezana.toml:toml4j:0.7.2'
+    // 日志
+    implementation 'org.apache.logging.log4j:log4j-core:2.14.0'
+
+    //TODO 添加其他依赖
+
+    // Use JUnit test framework
+    testImplementation 'junit:junit:4.12'
+}
+
+
+// clean dist、build、log directory
+task cleanAll(type: Delete) {
+    delete 'dist'
+    delete 'build'
+    delete 'log'
+    delete 'out'
+}
+
+tasks.clean.dependsOn(tasks.cleanAll)
+
+shadowJar {
+    mergeServiceFiles()
+    minimize()
+}
+
+// 打包操作，打包项目所有依赖生成 fat jar
+task makeJar(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar, dependsOn: shadowJar) {
+
+    destinationDir file('dist/apps')
+    archiveName project.name + "-" + project.version + '.jar'
+    exclude '**/*.xml'
+    exclude '**/*.toml'
+    exclude '**/*.properties'
+    exclude '**/*.yml'
+
+    manifest {
+        attributes(
+                'Main-Class': 'com.webank.wecross.stub.bcos.normal',
+                'version': project.version,
+        )
+    }
+
+    from zipTree(shadowJar.archivePath)
+}
+
+jar.enabled = false
+project.tasks.assemble.dependsOn(makeJar)
