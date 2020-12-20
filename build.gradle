@@ -61,12 +61,12 @@ task makeJar(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar, d
     exclude '**/*.properties'
     exclude '**/*.yml'
 
-    manifest {
-        attributes(
-                'Main-Class': 'wecross.stub.demo.DemoMain',
-                'version': project.version,
-        )
-    }
+//    manifest {
+//        attributes(
+//                'Main-Class': 'wecross.stub.demo.Main',
+//                'version': project.version,
+//        )
+//    }
 
     from zipTree(shadowJar.getArchiveFile())
 }

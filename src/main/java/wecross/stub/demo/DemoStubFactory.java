@@ -18,17 +18,23 @@ public class DemoStubFactory implements StubFactory {
 
     @Override
     public Driver newDriver() {
-        return null;
+        Driver driver = new DemoDriver();
+        // TODO, 初始化 Driver
+        return driver;
     }
 
     @Override
     public Connection newConnection(String path) {
-        return null;
+        Connection connection = new DemoConnection();
+        // TODO, 初始化 Connection
+        return connection;
     }
 
     @Override
     public Account newAccount(Map<String, Object> properties) {
-        return null;
+        Account account = new DemoAccount();
+        // TODO, 初始化 Account
+        return account;
     }
 
     @Override
