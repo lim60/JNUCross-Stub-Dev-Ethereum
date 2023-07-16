@@ -1,8 +1,8 @@
-package wecross.stub.demo;
+package wecross.stub.ethereum;
 
 import com.webank.wecross.stub.Account;
 
-public class DemoAccount implements Account {
+public class EthereumAccount implements Account {
     @Override
     public String getName() {
         return null;

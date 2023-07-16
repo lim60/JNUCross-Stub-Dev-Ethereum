@@ -1,4 +1,4 @@
-package wecross.stub.demo;
+package wecross.stub.ethereum;
 
 import com.webank.wecross.stub.Account;
 import com.webank.wecross.stub.BlockManager;
@@ -13,7 +13,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 
 import java.util.List;
 
-public class DemoDriver implements Driver {
+public class EthereumDriver implements Driver {
     @Override
     public ImmutablePair<Boolean, TransactionRequest> decodeTransactionRequest(Request request) {
         return null;

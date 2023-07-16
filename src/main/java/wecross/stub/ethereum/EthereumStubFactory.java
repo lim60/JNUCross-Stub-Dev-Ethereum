@@ -1,4 +1,4 @@
-package wecross.stub.demo;
+package wecross.stub.ethereum;
 
 import com.webank.wecross.stub.Account;
 import com.webank.wecross.stub.Connection;
@@ -10,7 +10,7 @@ import com.webank.wecross.stub.WeCrossContext;
 import java.util.Map;
 
 @Stub("StubDemo")
-public class DemoStubFactory implements StubFactory {
+public class EthereumStubFactory implements StubFactory {
     @Override
     public void init(WeCrossContext context) {
 
@@ -18,21 +18,21 @@ public class DemoStubFactory implements StubFactory {
 
     @Override
     public Driver newDriver() {
-        Driver driver = new DemoDriver();
+        Driver driver = new EthereumDriver();
         // TODO, 初始化 Driver
         return driver;
     }
 
     @Override
     public Connection newConnection(String path) {
-        Connection connection = new DemoConnection();
+        Connection connection = new EthereumConnection();
         // TODO, 初始化 Connection
         return connection;
     }
 
     @Override
     public Account newAccount(Map<String, Object> properties) {
-        Account account = new DemoAccount();
+        Account account = new EthereumAccount();
         // TODO, 初始化 Account
         return account;
     }

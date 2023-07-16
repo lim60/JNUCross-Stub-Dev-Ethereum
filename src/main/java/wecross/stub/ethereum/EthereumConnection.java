@@ -1,11 +1,11 @@
-package wecross.stub.demo;
+package wecross.stub.ethereum;
 
 import com.webank.wecross.stub.Connection;
 import com.webank.wecross.stub.Request;
 
 import java.util.Map;
 
-public class DemoConnection implements Connection {
+public class EthereumConnection implements Connection {
     @Override
     public void asyncSend(Request request, Callback callback) {
 
