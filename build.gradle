@@ -6,7 +6,7 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '5.2.0'
 }
 
-group 'wecross.stub.sample'
+group 'jnucross.stub.ethereum'
 version '1.0.0-SNAPSHOT'
 
 sourceCompatibility = 1.8
@@ -23,7 +23,7 @@ repositories {
 
 dependencies {
     // stub接口定义
-    implementation 'com.webank:wecross-java-stub:1.0.0'
+    implementation 'com.webank:wecross-java-stub:1.3.0'
     // toml解析器
     implementation 'com.moandjiezana.toml:toml4j:0.7.2'
 

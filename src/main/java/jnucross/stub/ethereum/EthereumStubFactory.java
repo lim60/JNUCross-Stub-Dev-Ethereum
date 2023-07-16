@@ -1,4 +1,4 @@
-package wecross.stub.ethereum;
+package jnucross.stub.ethereum;
 
 import com.webank.wecross.stub.Account;
 import com.webank.wecross.stub.Connection;
