@@ -29,6 +29,9 @@ dependencies {
 
     //TODO 添加其他依赖
 
+    // Ethereum SDK
+    implementation 'org.web3j:core:4.9.8'
+
     // Junit测试框架
     testImplementation 'junit:junit:4.12'
     // 日志

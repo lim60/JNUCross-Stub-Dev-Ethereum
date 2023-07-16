@@ -3,6 +3,9 @@ package jnucross.stub.ethereum;
 import com.webank.wecross.stub.Account;
 
 public class EthereumAccount implements Account {
+    // Ethereum version geth v1.10.16
+
+
     @Override
     public String getName() {
         return null;

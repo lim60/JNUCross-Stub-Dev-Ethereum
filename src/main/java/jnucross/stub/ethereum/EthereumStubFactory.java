@@ -9,7 +9,7 @@ import com.webank.wecross.stub.WeCrossContext;
 
 import java.util.Map;
 
-@Stub("StubDemo")
+@Stub("EthereumStub")
 public class EthereumStubFactory implements StubFactory {
     @Override
     public void init(WeCrossContext context) {
