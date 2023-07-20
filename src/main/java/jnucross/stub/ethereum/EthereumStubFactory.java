@@ -6,11 +6,18 @@ import com.webank.wecross.stub.Driver;
 import com.webank.wecross.stub.Stub;
 import com.webank.wecross.stub.StubFactory;
 import com.webank.wecross.stub.WeCrossContext;
+import jnucross.stub.ethereum.account.EthereumAccount;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
 @Stub("EthereumStub")
 public class EthereumStubFactory implements StubFactory {
+
+    private static final Logger logger = LoggerFactory.getLogger(EthereumStubFactory.class);
+
+
     @Override
     public void init(WeCrossContext context) {
 
@@ -25,14 +32,13 @@ public class EthereumStubFactory implements StubFactory {
 
     @Override
     public Connection newConnection(String path) {
-        Connection connection = new EthereumConnection();
-        // TODO, 初始化 Connection
-        return connection;
+        logger.info("New connection: {}", path);
+        return EthereumConnectionFactory.build(path, "stub.toml");
     }
 
     @Override
     public Account newAccount(Map<String, Object> properties) {
-        Account account = new EthereumAccount();
+        Account account = new EthereumAccount(properties);
         // TODO, 初始化 Account
         return account;
     }
