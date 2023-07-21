@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.methods.response.EthBlock;
+import org.web3j.protocol.core.methods.response.Transaction;
 import org.web3j.protocol.http.HttpService;
 
 import java.math.BigInteger;
@@ -27,6 +28,8 @@ public class EthereumConnection implements Connection {
             handleAsyncGetBlockNumberRequest(request, callback);
         } if (request.getType() == EthereumType.ConnectionMessage.ETHEREUM_GET_BLOCK_BY_NUMBER) {
             handleAsyncGetBlockByNumberRequest(request, callback);
+        } if (request.getType() == EthereumType.ConnectionMessage.ETHEREUM_GET_TRANSACTION) {
+            handleAsyncGetTransactionRequest(request, callback);
         } else {
             // Does not support asynchronous operation, async to sync
             logger.warn(" unrecognized request type, type: {}", request.getType());
@@ -52,6 +55,27 @@ public class EthereumConnection implements Connection {
             logger.debug(" blockNumber: {}", blockNumber);
         } catch (Exception e) {
             logger.warn("handleGetBlockNumberRequest Exception:", e);
+            response.setErrorCode(EthereumType.StatusCode.HandleCallRequestFailed);
+            response.setErrorMessage(e.getMessage());
+        }
+        callback.onResponse(response);
+    }
+
+    public void handleAsyncGetTransactionRequest(Request request, Callback callback) {
+        Response response = new Response();
+        try {
+            Map<Object, Object> map = request.getResourceInfo().getProperties();
+            Long blockNumber = (Long) map.get("blockNumber");
+            String transactionHash = (String) map.get("transactionHash");
+            boolean isVerified = (boolean) map.get("isVerified");
+            Transaction transaction = web3j.ethGetTransactionByHash(transactionHash).send().getTransaction().get();
+            response.setErrorCode(EthereumType.StatusCode.Success);
+            response.setErrorMessage(EthereumType.StatusCode.getStatusMessage(EthereumType.StatusCode.Success));
+            ObjectMapper objectMapper = new ObjectMapper();
+            response.setData(objectMapper.writeValueAsBytes(transaction));
+            logger.debug("get transaction by transactionHash : {}, transaction : {}", transactionHash, transaction.getRaw());
+        } catch (Exception e) {
+            logger.warn("handleGetBlockByNumberRequest Exception:", e);
             response.setErrorCode(EthereumType.StatusCode.HandleCallRequestFailed);
             response.setErrorMessage(e.getMessage());
         }
