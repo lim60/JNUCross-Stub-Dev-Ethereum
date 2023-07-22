@@ -13,6 +13,7 @@ public class EthereumType {
     public static final class ConnectionMessage {
         // Connection send message type
         public static final int ETHEREUM_CALL = 1001;
+        public static final int ETHEREUM_SEND_TRANSACTION = 1002;
         public static final int ETHEREUM_GET_BLOCK_NUMBER = 1004;
         public static final int ETHEREUM_GET_BLOCK_BY_NUMBER = 1005;
         public static final int ETHEREUM_GET_TRANSACTION = 1006;

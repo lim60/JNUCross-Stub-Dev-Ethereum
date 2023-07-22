@@ -101,4 +101,12 @@ public class EthereumAccount implements Account {
     public void setKeyID(int keyID) {
         this.keyID = keyID;
     }
+
+    public ECKeyPair getEcKeyPair() {
+        return ecKeyPair;
+    }
+
+    public BigInteger getPublicKey() {
+        return publicKey;
+    }
 }

@@ -123,9 +123,9 @@ public class EthereumStubTest {
 
     @Test
     public void WalletTest() throws Exception {
-//        String fileName = WalletUtils.generateNewWalletFile(
-//                "123456",
-//                new File("./src/test/resources/"));
+        String fileName = WalletUtils.generateNewWalletFile(
+                "123456",
+                new File("./src/test/resources/"));
 
         Credentials credentials = WalletUtils.loadCredentials("123456", "./src/test/resources/UTC--2023-07-20T11-49-41.564000000Z--6cc775daaf3687624cd97c94ce7bf45daef12c45.json");
         System.out.println(credentials.getEcKeyPair().getPrivateKey());
