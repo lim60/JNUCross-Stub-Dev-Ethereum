@@ -26,7 +26,12 @@ public class SignVerifyTest {
 
         Credentials credentials = WalletUtils.loadCredentials("123456", "./src/test/resources/UTC--2023-07-20T13-48-18.332000000Z--6ef422e32d17207d14c4dd1cb7cccb7450c67842.json");
         System.out.println("public key = " + credentials.getEcKeyPair().getPublicKey());
+        byte[] pubKey = Numeric.toBytesPadded(credentials.getEcKeyPair().getPublicKey(), 64);
+        System.out.println("pubKey.length = " + pubKey.length);
         System.out.println("private key = " + credentials.getEcKeyPair().getPrivateKey());
+        byte[] privKey = Numeric.toBytesPadded(credentials.getEcKeyPair().getPrivateKey(), 32);
+        System.out.println("privKey.length = " + privKey.length);
+        System.out.println("privKey = " + Numeric.toHexString(privKey));
         System.out.println("address = " + credentials.getAddress());
         Account account = new EthereumAccount("ethereum", "user", credentials.getEcKeyPair());
         byte[] signedMessage = driver.accountSign(account, message.getBytes());

@@ -1,26 +1,28 @@
 package jnucross.stub.ethereum;
 
 import org.junit.Test;
-import org.web3j.crypto.CipherException;
-import org.web3j.crypto.Credentials;
-import org.web3j.crypto.RawTransaction;
-import org.web3j.crypto.WalletUtils;
+import org.web3j.crypto.*;
 import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.DefaultBlockParameterName;
-import org.web3j.protocol.core.Request;
 import org.web3j.protocol.core.methods.response.*;
+import org.web3j.protocol.exceptions.TransactionException;
 import org.web3j.protocol.http.HttpService;
-import org.web3j.tx.RawTransactionManager;
 import org.web3j.tx.TransactionManager;
 import org.web3j.tx.Transfer;
 import org.web3j.tx.gas.DefaultGasProvider;
+import org.web3j.tx.response.PollingTransactionReceiptProcessor;
+import org.web3j.tx.response.TransactionReceiptProcessor;
 import org.web3j.utils.Convert;
+import org.web3j.utils.Numeric;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 
 /**
  * @author SDKany
@@ -38,7 +40,7 @@ public class EthereumTransferTest {
         System.out.println(web3j.web3ClientVersion().send().getWeb3ClientVersion());
 
         Credentials credentials = WalletUtils.loadCredentials("lix", "./src/test/resources/UTC--2023-07-16T15-59-49.181165420Z--18032fb1bb6731060bed83316db4aab0c97e45b4");
-        //System.out.println(credentials.getEcKeyPair().getPrivateKey());
+        System.out.println(credentials.getEcKeyPair().getPrivateKey());
         //System.out.println(credentials.getEcKeyPair().getPublicKey());
         System.out.println(credentials.getAddress());
 
@@ -103,5 +105,49 @@ public class EthereumTransferTest {
         for (String i : addressList) {
             System.out.println("account : " + i);
         }
+    }
+
+    @Test
+    public void TransferTest2() throws CipherException, IOException, TransactionException, InterruptedException, ExecutionException {// Connect to the node
+
+        // Load an account
+        Credentials credentials = WalletUtils.loadCredentials("lix", "./src/test/resources/UTC--2023-07-16T15-59-49.181165420Z--18032fb1bb6731060bed83316db4aab0c97e45b4");
+
+        EthGetTransactionCount ethGetTransactionCount = web3j
+                .ethGetTransactionCount(credentials.getAddress(), DefaultBlockParameterName.LATEST).send();
+        BigInteger nonce = ethGetTransactionCount.getTransactionCount();
+
+        EthGetBalance ethGetBalance = web3j.ethGetBalance(credentials.getAddress(), DefaultBlockParameterName.LATEST).send();
+        System.out.println("balance1 : " + ethGetBalance.getBalance());
+        System.out.println("账号余额(eth)1：" + Convert.fromWei(String.valueOf(ethGetBalance.getBalance()), Convert.Unit.ETHER) + "ETH");
+
+        RawTransaction rawTransaction = RawTransaction.createTransaction(nonce, new BigInteger("10"), new BigInteger("3000000"),
+               "0x6ef422e32d17207d14c4dd1cb7cccb7450c67842", new BigInteger("99"), "0x01234567890ABCDEF");
+
+        byte[] signedMessage = TransactionEncoder.signMessage(rawTransaction, 1337,credentials);
+        String hexValue = Numeric.toHexString(signedMessage);
+
+        EthSendTransaction ethSendTransaction = web3j.ethSendRawTransaction(hexValue).sendAsync().get();
+
+        if(ethSendTransaction.getError() != null)
+            System.out.println("error : " + ethSendTransaction.getError().getMessage());
+
+        System.out.println("transHash = " + ethSendTransaction.getTransactionHash());
+
+        System.out.println("hexValue : " + hexValue);
+
+        TransactionReceiptProcessor receiptProcessor = new PollingTransactionReceiptProcessor(
+                web3j,
+                TransactionManager.DEFAULT_POLLING_FREQUENCY,
+                TransactionManager.DEFAULT_POLLING_ATTEMPTS_PER_TX_HASH);
+        TransactionReceipt txReceipt = receiptProcessor.waitForTransactionReceipt(ethSendTransaction.getTransactionHash());
+        System.out.println("success mined!!!!");
+        System.out.println(txReceipt.getTransactionHash());
+        System.out.println(txReceipt.getBlockHash());
+        System.out.println(txReceipt.getBlockNumber());
+        System.out.println(txReceipt);
+
+        System.out.println(web3j.ethGetTransactionByHash(txReceipt.getTransactionHash()).send().getTransaction().get().getInput());
+
     }
 }

@@ -18,6 +18,7 @@ public class EthereumAccount implements Account {
     private String type;
     private BigInteger publicKey;
     private ECKeyPair ecKeyPair;
+    private String identity;
 
     private int keyID;
 
@@ -30,15 +31,22 @@ public class EthereumAccount implements Account {
         this.type = type;
         this.publicKey = ecKeyPair.getPublicKey();
         this.ecKeyPair = ecKeyPair;
+        this.identity = Keys.getAddress(publicKey);
     }
 
     public EthereumAccount(Map<String, Object> properties) {
         String name = (String) properties.get("name");
+        String address = (String) properties.get("address");
         String pubKeyStr = (String) properties.get("publicKey");
         String priKeyStr = (String) properties.get("privateKey");
         String type = (String) properties.get("type");
         if (name == null || name.length() == 0) {
             logger.error("name has not given");
+            return;
+        }
+
+        if (address == null || address.length() == 0) {
+            logger.error("address has not given");
             return;
         }
 
@@ -63,6 +71,7 @@ public class EthereumAccount implements Account {
             logger.info("New account: {} type:{}", name, type);
             ECKeyPair ecKeyPair = new ECKeyPair(privateKey, publicKey);
 
+            this.identity = address;
             this.name = name;
             this.type = type;
             this.publicKey = publicKey;
@@ -85,7 +94,7 @@ public class EthereumAccount implements Account {
 
     @Override
     public String getIdentity() {
-        return Keys.getAddress(ecKeyPair);
+        return this.identity;
     }
 
     @Override

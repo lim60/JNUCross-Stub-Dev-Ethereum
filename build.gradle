@@ -27,8 +27,13 @@ dependencies {
     // toml解析器
     implementation 'com.moandjiezana.toml:toml4j:0.7.2'
 
-    //TODO 添加其他依赖
+    implementation 'com.alibaba:fastjson:1.1.25'
 
+
+
+    //TODO 添加其他依赖
+    // CITA SDK
+    compile 'com.citahub.cita:core:20.2.0'
     // Ethereum SDK
     implementation 'org.web3j:core:4.9.8'
 

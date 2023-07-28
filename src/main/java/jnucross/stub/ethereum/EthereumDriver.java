@@ -7,19 +7,6 @@ import jnucross.stub.ethereum.common.EthereumType;
 import jnucross.stub.ethereum.utils.BlockUtils;
 import jnucross.stub.ethereum.utils.TransactionUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.bouncycastle.crypto.digests.SHA256Digest;
-import org.bouncycastle.crypto.params.ECDomainParameters;
-import org.bouncycastle.crypto.params.ECPrivateKeyParameters;
-import org.bouncycastle.crypto.params.ECPublicKeyParameters;
-import org.bouncycastle.crypto.signers.ECDSASigner;
-import org.bouncycastle.crypto.signers.HMacDSAKCalculator;
-import org.bouncycastle.math.ec.ECAlgorithms;
-import org.bouncycastle.math.ec.ECCurve;
-import org.bouncycastle.math.ec.ECFieldElement;
-import org.bouncycastle.math.ec.ECPoint;
-import org.bouncycastle.math.ec.custom.sec.SecP256K1Curve;
-import org.bouncycastle.math.ec.custom.sec.SecP256K1Point;
-import org.bouncycastle.util.BigIntegers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.web3j.crypto.*;
@@ -28,7 +15,6 @@ import org.web3j.utils.Numeric;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.security.interfaces.ECPublicKey;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -36,8 +22,6 @@ import java.util.List;
 public class EthereumDriver implements Driver {
 
     private static final Logger logger = LoggerFactory.getLogger(EthereumDriver.class);
-    public static final BigInteger ONE = BigInteger.valueOf(1);
-    public static final BigInteger EIGHT = BigInteger.valueOf(8);
 
     @Override
     public ImmutablePair<Boolean, TransactionRequest> decodeTransactionRequest(Request request) {
@@ -47,6 +31,7 @@ public class EthereumDriver implements Driver {
                 && (requestType != EthereumType.ConnectionMessage.ETHEREUM_SEND_TRANSACTION)) {
             return new ImmutablePair<>(false, null);
         }
+
 
 
 

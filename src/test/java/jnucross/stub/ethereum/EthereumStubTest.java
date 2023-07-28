@@ -25,6 +25,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class EthereumStubTest {
     @Test
@@ -104,11 +105,12 @@ public class EthereumStubTest {
     }
 
     @Test
-    public void TestToml(){
+    public void TestToml() throws ExecutionException, InterruptedException {
         String path = "./src/test/resources";
         String fileName = "stub-test.toml";
 
         EthereumConnection connection = EthereumConnectionFactory.build(path, fileName);
+        System.out.println(connection.getWeb3j().ethChainId().sendAsync().get().getChainId());
         List<String> addressList = null;
         try {
             addressList = connection.getWeb3j().ethAccounts().send().getAccounts();
