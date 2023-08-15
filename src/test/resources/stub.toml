@@ -1,0 +1,39 @@
+[common]
+    name = 'bcos' # stub must be same with directory name
+    type = 'BCOS2.0' # BCOS or GM_BCOS2.0
+
+[chain]
+    groupId = 1 # default 1
+    chainId = 1 # default 1
+
+[channelService]
+    caCert = 'ca.crt'
+    sslCert = 'sdk.crt'
+    sslKey = 'sdk.key'
+    gmConnectEnable = false #ssl gm or not
+    gmCaCert = 'gm/gmca.crt'
+    gmSslCert = 'gm/gmsdk.crt'
+    gmSslKey = 'gm/gmsdk.key'
+    gmEnSslCert = 'gm/gmensdk.crt'
+    gmEnSslKey = 'gm/gmensdk.key'
+    timeout = 300000  # ms, default 60000ms
+    connectionsStr = ['http://81.71.46.41:8546']
+    threadNum = 18
+    threadQueueCapacity = 5000
+
+# resources is a list
+[[resources]]
+# name cannot be repeated
+    name = 'CNS'
+    type = 'GETH_CONTRACT'
+    contractAddress = '0xc0ae66c325a990f5e3F6b537Ae54880561FB7831'
+[[resources]]
+# name cannot be repeated
+    name = 'WeCrossProxy'
+    type = 'GETH_CONTRACT'
+    contractAddress = '0x1628c9a26079ba00d3c4749b709e03bb72a82a31'
+[[resources]]
+# name cannot be repeated
+    name = 'WeCrossHub'
+    type = 'GETH_CONTRACT'
+    contractAddress = '0x940fb9eaf35b92bbf156fd0df75aab238df3c6de'

@@ -1,0 +1,120 @@
+1. 包路径： com.webank.wecross.stub.cita
+2. gradle group ：com.webank.wecross
+3. 【更新：可以不用】去除其他依赖中的springframework 
+implementation ('link.luyu:luyu-java-sdk:1.0.0'){
+        exclude group: "org.springframework.boot"
+    }
+4. 【更新：可以不用】去除netty依赖
+    dependencies {
+        exclude(dependency('io.netty:.*'))
+    }
+5. makeJar中定义主类入口
+    manifest {
+        attributes(
+                'Main-Class': 'com.webank.wecross.stub.cita.CITAStubFactory',
+                'version': project.version,
+        )
+    }
+6. wecross依赖版本1.3.0
+
+7. 两个toml路径最好写死。或者修改conf/wecross.toml中的chains.path为绝对路径
+**更新：不用写死，不要使用 File打开路径，使用：
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+Resource resource = resolver.getResource(confFilePath);
+toml =toml.read(resource.getInputStream());
+
+8. Connection.build 不要返回 null
+	return connection
+9. Driver.getResources 不要返回null 
+	return new ArrayList<>();
+10. Account-Manager的链账号目前需要手动写入
+
+11.两个peer之间的block number不能同步：
+Driver.getResources不要返回空数组:
+    public List<ResourceInfo> getResources(Connection connection) {
+        logger.error("@@@getResources was called but returns empty!");
+        //A dumb Recource list:
+        List<ResourceInfo> ResourceInfoList = new ArrayList<>();
+        ResourceInfo resourceInfo = new ResourceInfo();
+        resourceInfo.setName("Nonsense CITA Resource");
+        resourceInfo.setStubType("CITAStub");
+        resourceInfo.setProperties(null);
+        resourceInfo.setChecksum(null);
+
+        ResourceInfoList.add(resourceInfo);
+
+        return ResourceInfoList;
+        //return new ArrayList<>();
+        /*return null;*/
+    }
+**注：这种伪造的Resource会导致交易出错
+
+12.Connection.setConnectionEventHandler需要实现：
+Connection类添加属性： private ConnectionEventHandler eventHandler = null;
+
+ public void setConnectionEventHandler(ConnectionEventHandler eventHandler) {
+        this.eventHandler = eventHandler;
+    }
+
+13.Account构造函数，从properties里读取的字段没有name，应与以下字段对应：
+@@@!{ext0=0xf762fb195566bc8180cfe23c48ddd09bca6d3979, isDefault=true, secKey=0xa2700246a70b2450232089b6f6d980f09535306c1508b9e76b4ad63ad3055b1, keyID=10, type=CITAStub, ext3=null, ext2=null, username=org1-admin, pubKey=0x14d308ea5d2da035dd4c1717f4ee63ea8a1813e95eb114f94cb6a4d1337c6452a5b6c4f1edef3320fb97cec401e3ebdc422f9fe290097b06ba56d8159242d1de, ext1=null}
+
+14.Account构造函数，properties里不会传address或identity，在数据库里令ext0的值等于identity，在构造函数里读ext0当做address
+
+
+@@@以太坊
+11. ethereumConnection: getResources addall() 空指针
+修改：第213行  
+List<ResourceInfo> resources = new ArrayList<>();
+if (resourceInfoList != null) {
+    resources.addAll(resourceInfoList);
+}
+
+12.connection.asyncSend逻辑有点问题
+第2、3、4个if改成else if
+
+13. BlockUtils.java 200行
+stubBlock的RawBytes不能设置为null
+原因：
+WeCross 的 ChainInfo.java 85行：genensisBlockHeaderFuture.complete(block.getRawBytes());
+WeCross 的 ChainInfo.java 92行：genesisBlockHeader = genensisBlockHeaderFuture.get(20, TimeUnit.SECONDS);
+Header为空会报错
+
+解决：RawBytes设置为new byte() {}
+
+14.Ethereum和CITA中都依赖okhttp3，CITA的版本更老，与ethereum冲突
+解决：在CITA的build.gradle中，修改dependencies：
+    implementation ('com.citahub.cita:core:20.2.0'){
+        exclude group:'com.squareup.okhttp3'
+    }
+
+    implementation "com.squareup.okhttp3:okhttp:4.9.0"
+
+15.2023-08-10 17:13:15.101 [pool-3-thread-1] WARN  EthereumConnection() - handleGetBlockByNumberRequest Exception:
+com.fasterxml.jackson.databind.JsonMappingException: Value must be in format 0x[0-9a-fA-F]+ (through reference chain: org.web3j.protocol.core.methods.response.EthBlock$Block["transactions"]->java.util.ArrayList[0]->org.web3j.protocol.core.methods.response.EthBlock$TransactionObject["maxPriorityFeePerGas"])
+at com.webank.wecross.stub.ethereum.EthereumConnection.handleAsyncGetBlockByNumberRequest(EthereumConnection.java:196) ~[Ethereum-Stub-JNU-cccc.jar:?]
+
+在EthereumConnection.handleAsyncGetBlockByNumberRequest先把EthBlock 用covertToBlock转换为wecross的Block再序列化：
+Block weCrossBlock = BlockUtils.covertToBlock(block);
+            response.setErrorMessage(EthereumType.StatusCode.getStatusMessage(Success));
+            ObjectMapper objectMapper = new ObjectMapper();
+            response.setData(objectMapper.writeValueAsBytes(weCrossBlock));
+
+在EthereumDriver.asyncGetBlock直接把接收的变量定义为wecross的Block
+Block block = null;
+                        try {
+                            block = objectMapper.readValue(response.getData(), Block.class);
+
+15.两个peer之间的block number不能同步：
+同CITA 11.
+
+16.Connection.setConnectionEventHandler需要实现：
+同CITA 12.
+	
+17. Config.java line 23: WalletUtils.loadCredentials读不到：
+路径改为："./conf/UTC--2023-07-16T15-59-49.181165420Z--18032fb1bb6731060bed83316db4aab0c97e45b4"
+把文件放在某个节点的conf路径下
+
+

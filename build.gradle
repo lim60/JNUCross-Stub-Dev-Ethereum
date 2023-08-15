@@ -1,3 +1,5 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 plugins {
     id 'java'
     id 'idea'
@@ -6,8 +8,8 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '5.2.0'
 }
 
-group 'jnucross.stub.ethereum'
-version '1.0.0-SNAPSHOT'
+group 'com.webank.wecross.stub.ethereum'
+version '0.2.3'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -27,13 +29,8 @@ dependencies {
     // toml解析器
     implementation 'com.moandjiezana.toml:toml4j:0.7.2'
 
-    implementation 'com.alibaba:fastjson:1.1.25'
-
-
-
     //TODO 添加其他依赖
-    // CITA SDK
-    compile 'com.citahub.cita:core:20.2.0'
+
     // Ethereum SDK
     implementation 'org.web3j:core:4.9.8'
 
@@ -60,9 +57,9 @@ shadowJar {
 }
 
 // 打包操作，打包项目所有依赖生成 fat jar
-task makeJar(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar, dependsOn: shadowJar) {
+task makeJar(type: ShadowJar, dependsOn: shadowJar) {
 
-    destinationDir file('dist/apps')
+    destinationDir file('D:\\暨南大学\\cita_jar\\ethereum')
     archiveName project.name + "-" + project.version + '.jar'
     exclude '**/*.xml'
     exclude '**/*.toml'
