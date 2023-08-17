@@ -31,6 +31,8 @@ dependencies {
 
     //TODO 添加其他依赖
 
+    // CITA SDK
+    //compile 'com.citahub.cita:core:20.2.0'
     // Ethereum SDK
     implementation 'org.web3j:core:4.9.8'
 
@@ -59,7 +61,7 @@ shadowJar {
 // 打包操作，打包项目所有依赖生成 fat jar
 task makeJar(type: ShadowJar, dependsOn: shadowJar) {
 
-    destinationDir file('D:\\暨南大学\\cita_jar\\ethereum')
+    destinationDir file('C:\\Users\\SDKany\\Desktop')
     archiveName project.name + "-" + project.version + '.jar'
     exclude '**/*.xml'
     exclude '**/*.toml'

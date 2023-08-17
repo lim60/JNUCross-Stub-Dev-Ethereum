@@ -7,6 +7,7 @@ import com.webank.wecross.stub.ethereum.common.EthereumType;
 import com.webank.wecross.stub.ethereum.contract.Contract;
 import com.webank.wecross.stub.ethereum.protpcol.TransactionParams;
 import com.webank.wecross.stub.ethereum.utils.BlockUtils;
+import com.webank.wecross.stub.ethereum.utils.TransactionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
@@ -53,6 +54,7 @@ public class EthereumConnection implements Connection {
 
     @Override
     public void asyncSend(Request request, Callback callback) {
+        logger.debug("in geth connection asyncSend");
         if (request.getType() == EthereumType.ConnectionMessage.ETHEREUM_SEND_TRANSACTION) {
             handleAsyncTransactionRequest(request, callback);
         }
@@ -157,6 +159,8 @@ public class EthereumConnection implements Connection {
         Response response = new Response();
         try {
             BigInteger blockNumber = web3j.ethBlockNumber().send().getBlockNumber();
+            logger.debug("&&&&&&&&&&&&&\n In handleAsyncGetBlockNumberRequest");
+            logger.debug(" blockNumber: {}", blockNumber);
             response.setErrorCode(Success);
             response.setErrorMessage(EthereumType.StatusCode.getStatusMessage(Success));
             response.setData(blockNumber.toByteArray());
@@ -172,18 +176,22 @@ public class EthereumConnection implements Connection {
     private void handleAsyncGetTransactionRequest(Request request, Callback callback) {
         Response response = new Response();
         try {
+            logger.debug("in handleAsyncGetTransactionRequest");
             Map<Object, Object> map = request.getResourceInfo().getProperties();
             Long blockNumber = (Long) map.get("blockNumber");
             String transactionHash = (String) map.get("transactionHash");
+            logger.debug("transactionHash: {}", transactionHash);
             boolean isVerified = (boolean) map.get("isVerified");
             Transaction transaction = web3j.ethGetTransactionByHash(transactionHash).send().getTransaction().get();
+            logger.debug("transaction: {}", transaction);
             response.setErrorCode(Success);
             response.setErrorMessage(EthereumType.StatusCode.getStatusMessage(Success));
             ObjectMapper objectMapper = new ObjectMapper();
-            response.setData(objectMapper.writeValueAsBytes(transaction));
+            com.webank.wecross.stub.Transaction weCrossTransaction = TransactionUtils.covertToTransaction(transaction);
+            response.setData(objectMapper.writeValueAsBytes(weCrossTransaction));
             logger.debug("get transaction by transactionHash : {}, transaction : {}", transactionHash, transaction.getRaw());
         } catch (Exception e) {
-            logger.warn("handleGetBlockByNumberRequest Exception:", e);
+            logger.warn("handleAsyncGetTransactionRequest Exception:", e);
             response.setErrorCode(EthereumType.StatusCode.HandleCallRequestFailed);
             response.setErrorMessage(e.getMessage());
         }
@@ -193,18 +201,25 @@ public class EthereumConnection implements Connection {
     private void handleAsyncGetBlockByNumberRequest(Request request, Callback callback) {
         Response response = new Response();
         try {
+            logger.debug("in handleAsyncGetBlockByNumberRequest");
+            logger.debug("request : {}", request);
+            logger.debug("request.getResourceInfo() : {}", request.getResourceInfo());
+            logger.debug("request.getData() : {}", request.getData());
             BigInteger blockNumber = BigInteger.valueOf((Long) request.getResourceInfo().getProperties().get("blockNumber"));
+            logger.debug("blockNumber = {}", blockNumber);
             EthBlock.Block block = web3j.ethGetBlockByNumber(
                     DefaultBlockParameter.valueOf(blockNumber), true).send().getBlock();
             response.setErrorCode(Success);
+            logger.debug("block = {}", block);
             response.setErrorMessage(EthereumType.StatusCode.getStatusMessage(Success));
             ObjectMapper objectMapper = new ObjectMapper();
             Block weCrossBlock = BlockUtils.covertToBlock(block);
+            logger.debug("weCrossBlock = {}", weCrossBlock);
             response.setData(objectMapper.writeValueAsBytes(weCrossBlock));
             logger.debug("get block by number : {}, block : {}", blockNumber, block);
         } catch (Exception e) {
             //logger.warn("###"+request.toString());
-            logger.warn("handleGetBlockByNumberRequest Exception:", e);
+            logger.warn("handleAsyncGetBlockByNumberRequest Exception:", e);
             response.setErrorCode(EthereumType.StatusCode.HandleCallRequestFailed);
             response.setErrorMessage(e.getMessage());
         }
@@ -255,8 +270,10 @@ public class EthereumConnection implements Connection {
                     }
                 };
         String[] paths = listPaths();
+        logger.debug("EthereumConnection getResources(), paths: {}", paths);
         if (Objects.nonNull(paths)) {
             for (String path : paths) {
+                logger.debug("EthereumConnection getResources(), path: {}", path);
                 ResourceInfo resourceInfo = new ResourceInfo();
                 resourceInfo.setStubType(properties.get(GETH_STUB_TYPE));
                 resourceInfo.setName(path.split("\\.")[2]);
@@ -287,7 +304,9 @@ public class EthereumConnection implements Connection {
      */
     public String[] listPaths() {
         try {
+            logger.debug(" in listPaths listPaths listPaths ");
             List paths = Contract.proxy.getPaths().sendAsync().get();
+            logger.debug(" listPaths path : {}", paths);
             if (Objects.nonNull(paths) && paths.size() != 0) {
                 Set<String> set = new LinkedHashSet<>();
                 for (int i = paths.size() - 1; i >= 0; i--) {

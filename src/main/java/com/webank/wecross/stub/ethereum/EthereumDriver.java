@@ -474,12 +474,19 @@ public class EthereumDriver implements Driver {
 
     @Override
     public void asyncGetBlock(long blockNumber, boolean onlyHeader, Connection connection, GetBlockCallback callback) {
+        logger.debug("************");
+        logger.debug("in geth asyncGetBlock");
+        logger.debug("blockNumber = {}", blockNumber);
+        logger.debug("onlyHeader = {}", onlyHeader);
+        logger.debug("************");
         Request request = Request.newRequest(EthereumType.ConnectionMessage.ETHEREUM_GET_BLOCK_BY_NUMBER, "");
         HashMap hashMap = new HashMap<>();
         hashMap.put("blockNumber", blockNumber);
         ResourceInfo resourceInfo = new ResourceInfo();
         resourceInfo.setProperties(hashMap);
         request.setResourceInfo(resourceInfo);
+        logger.debug("connection : {}", connection);
+        logger.debug("connection.getProperties() : {}", connection.getProperties());
         connection.asyncSend(
                 request,
                 response -> {
@@ -500,7 +507,8 @@ public class EthereumDriver implements Driver {
                             e.printStackTrace();
                         }
 
-                        logger.debug(" blockNumber: {}", blockNumber);
+                        logger.error(" blockNumber: {}", blockNumber);
+                        logger.error("block : {}", block);
                         callback.onResponse(null, block);
                     }
                 });
@@ -533,14 +541,13 @@ public class EthereumDriver implements Driver {
                         callback.onResponse(new Exception(response.getErrorMessage()), null);
                     } else {
                         ObjectMapper objectMapper = new ObjectMapper();
-                        org.web3j.protocol.core.methods.response.Transaction transaction = null;
+                        com.webank.wecross.stub.Transaction weCrossTransaction = null;
                         try {
-                            transaction = objectMapper.readValue(response.getData(), org.web3j.protocol.core.methods.response.Transaction.class);
+                            weCrossTransaction = objectMapper.readValue(response.getData(), com.webank.wecross.stub.Transaction.class);
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
-                        com.webank.wecross.stub.Transaction weCrossTransaction = TransactionUtils.covertToTransaction(transaction);
-                        logger.debug("get transaction by transactionHash : {}, transaction : {}", transactionHash, weCrossTransaction.toString());
+                        logger.debug("weCrossTransaction: {}", weCrossTransaction);
                         callback.onResponse(null, weCrossTransaction);
                     }
                 });

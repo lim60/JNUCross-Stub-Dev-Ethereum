@@ -29,7 +29,7 @@ public class Config {
     public static String HUB_ADDRESS = "0x940fb9eaf35b92bbf156fd0df75aab238df3c6de";
     public static String PROXY_ADDRESS = "0x1628c9a26079ba00d3c4749b709e03bb72a82a31";
     public static String CNS_ADDRESS = "0xc0ae66c325a990f5e3F6b537Ae54880561FB7831";
-    public static String ETH_URL = "http://81.71.46.41:8546";
+    public static String ETH_URL = "http://10.154.24.12:8545"; //"http://81.71.46.41:8546";
     public static ContractGasProvider contractGasProvider = new ContractGasProvider() {
 
         @Override
